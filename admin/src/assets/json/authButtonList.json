@@ -1,0 +1,16 @@
+{
+  "useProTable": [
+    "add",
+    "batchAdd",
+    "export",
+    "batchDelete",
+    "status"
+  ],
+  "authButton": [
+    "add",
+    "edit",
+    "delete",
+    "export",
+    "import"
+  ]
+}

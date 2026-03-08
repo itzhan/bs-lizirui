@@ -1,0 +1,194 @@
+[
+  {
+    "path": "/home/index",
+    "name": "home",
+    "component": "/home/index",
+    "meta": {
+      "icon": "HomeFilled",
+      "title": "首页",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": true,
+      "isKeepAlive": true
+    }
+  },
+  {
+    "path": "/product",
+    "name": "product",
+    "redirect": "/product/list",
+    "meta": {
+      "icon": "Goods",
+      "title": "商品管理",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": false,
+      "isKeepAlive": true
+    },
+    "children": [
+      {
+        "path": "/product/list",
+        "name": "productList",
+        "component": "/product/list/index",
+        "meta": {
+          "icon": "Menu",
+          "title": "商品列表",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      },
+      {
+        "path": "/product/category",
+        "name": "productCategory",
+        "component": "/product/category/index",
+        "meta": {
+          "icon": "Grid",
+          "title": "分类管理",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      }
+    ]
+  },
+  {
+    "path": "/order",
+    "name": "order",
+    "redirect": "/order/list",
+    "meta": {
+      "icon": "List",
+      "title": "订单管理",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": false,
+      "isKeepAlive": true
+    },
+    "children": [
+      {
+        "path": "/order/list",
+        "name": "orderList",
+        "component": "/order/list/index",
+        "meta": {
+          "icon": "Document",
+          "title": "订单列表",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      }
+    ]
+  },
+  {
+    "path": "/user",
+    "name": "userManage",
+    "redirect": "/user/list",
+    "meta": {
+      "icon": "UserFilled",
+      "title": "用户管理",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": false,
+      "isKeepAlive": true
+    },
+    "children": [
+      {
+        "path": "/user/list",
+        "name": "userList",
+        "component": "/user/list/index",
+        "meta": {
+          "icon": "User",
+          "title": "用户列表",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      }
+    ]
+  },
+  {
+    "path": "/review",
+    "name": "review",
+    "redirect": "/review/list",
+    "meta": {
+      "icon": "ChatDotSquare",
+      "title": "评论管理",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": false,
+      "isKeepAlive": true
+    },
+    "children": [
+      {
+        "path": "/review/list",
+        "name": "reviewList",
+        "component": "/review/list/index",
+        "meta": {
+          "icon": "Comment",
+          "title": "评论列表",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      }
+    ]
+  },
+  {
+    "path": "/content",
+    "name": "content",
+    "redirect": "/content/announcement",
+    "meta": {
+      "icon": "Notification",
+      "title": "内容管理",
+      "isLink": "",
+      "isHide": false,
+      "isFull": false,
+      "isAffix": false,
+      "isKeepAlive": true
+    },
+    "children": [
+      {
+        "path": "/content/announcement",
+        "name": "announcement",
+        "component": "/content/announcement/index",
+        "meta": {
+          "icon": "Bell",
+          "title": "公告管理",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      },
+      {
+        "path": "/content/banner",
+        "name": "banner",
+        "component": "/content/banner/index",
+        "meta": {
+          "icon": "Picture",
+          "title": "轮播图管理",
+          "isLink": "",
+          "isHide": false,
+          "isFull": false,
+          "isAffix": false,
+          "isKeepAlive": true
+        }
+      }
+    ]
+  }
+]
