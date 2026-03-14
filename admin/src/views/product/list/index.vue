@@ -1,27 +1,21 @@
 <template>
   <div class="table-box">
-    <div class="card table-search" style="margin-bottom: 16px;">
-      <el-form :inline="true">
-        <el-form-item label="关键词">
-          <el-input v-model="searchParams.keyword" placeholder="商品名称/品牌" clearable @keyup.enter="search" />
-        </el-form-item>
-        <el-form-item label="分类">
-          <el-select v-model="searchParams.categoryId" placeholder="全部分类" clearable>
-            <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchParams.status" placeholder="全部" clearable>
-            <el-option label="上架" :value="1" />
-            <el-option label="下架" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
-          <el-button type="success" @click="openDialog('add')">新增商品</el-button>
-        </el-form-item>
-      </el-form>
+    <div class="search-bar">
+      <span style="color: #606266; font-size: 14px">关键词</span>
+      <el-input v-model="searchParams.keyword" placeholder="商品名称/品牌" clearable style="width: 180px" @keyup.enter="search" />
+      <span style="color: #606266; font-size: 14px">分类</span>
+      <el-select v-model="searchParams.categoryId" placeholder="全部分类" clearable style="width: 140px">
+        <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
+      </el-select>
+      <span style="color: #606266; font-size: 14px">状态</span>
+      <el-select v-model="searchParams.status" placeholder="全部" clearable style="width: 100px">
+        <el-option label="上架" :value="1" />
+        <el-option label="下架" :value="0" />
+      </el-select>
+      <el-button type="primary" @click="search">搜索</el-button>
+      <el-button @click="resetSearch">重置</el-button>
+      <div style="flex: 1" />
+      <el-button type="success" @click="openDialog('add')">新增商品</el-button>
     </div>
     <el-card shadow="never">
       <el-table :data="tableData" stripe v-loading="loading">
@@ -47,9 +41,15 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination v-model:current-page="searchParams.page" v-model:page-size="searchParams.size"
-        :page-sizes="[10, 20, 50]" :total="total" layout="total, sizes, prev, pager, next" @change="getTableData"
-        style="margin-top: 16px; justify-content: flex-end;" />
+      <el-pagination
+        v-model:current-page="searchParams.page"
+        v-model:page-size="searchParams.size"
+        :page-sizes="[10, 20, 50]"
+        :total="total"
+        layout="total, sizes, prev, pager, next"
+        @change="getTableData"
+        style="margin-top: 16px; justify-content: flex-end"
+      />
     </el-card>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px">
@@ -61,6 +61,15 @@
           </el-select>
         </el-form-item>
         <el-form-item label="品牌"><el-input v-model="formData.brand" /></el-form-item>
+        <el-form-item label="图片URL">
+          <el-input v-model="formData.mainImage" placeholder="输入图片链接" />
+          <el-image
+            v-if="formData.mainImage"
+            :src="formData.mainImage"
+            style="width: 100px; height: 100px; margin-top: 8px"
+            fit="cover"
+          />
+        </el-form-item>
         <el-form-item label="价格"><el-input-number v-model="formData.price" :min="0" :precision="2" /></el-form-item>
         <el-form-item label="原价"><el-input-number v-model="formData.originalPrice" :min="0" :precision="2" /></el-form-item>
         <el-form-item label="库存"><el-input-number v-model="formData.stock" :min="0" /></el-form-item>
@@ -84,10 +93,26 @@ const loading = ref(false);
 const tableData = ref<any[]>([]);
 const total = ref(0);
 const categories = ref<any[]>([]);
-const searchParams = reactive({ page: 1, size: 10, keyword: "", categoryId: undefined as number | undefined, status: undefined as number | undefined });
+const searchParams = reactive({
+  page: 1,
+  size: 10,
+  keyword: "",
+  categoryId: undefined as number | undefined,
+  status: undefined as number | undefined
+});
 const dialogVisible = ref(false);
 const dialogTitle = ref("新增商品");
-const formData = reactive<any>({ name: "", categoryId: null, brand: "", price: 0, originalPrice: 0, stock: 0, recommend: 0, description: "" });
+const formData = reactive<any>({
+  name: "",
+  categoryId: null,
+  brand: "",
+  mainImage: "",
+  price: 0,
+  originalPrice: 0,
+  stock: 0,
+  recommend: 0,
+  description: ""
+});
 
 const getTableData = async () => {
   loading.value = true;
@@ -95,33 +120,65 @@ const getTableData = async () => {
     const { data } = await http.get<any>("/api/admin/products", searchParams, { loading: false });
     tableData.value = data.records || [];
     total.value = data.total || 0;
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 };
 
 const getCategories = async () => {
   try {
     const { data } = await http.get<any>("/api/admin/categories", {}, { loading: false });
     categories.value = data || [];
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 };
 
-const search = () => { searchParams.page = 1; getTableData(); };
-const resetSearch = () => { searchParams.keyword = ""; searchParams.categoryId = undefined; searchParams.status = undefined; search(); };
+const search = () => {
+  searchParams.page = 1;
+  getTableData();
+};
+const resetSearch = () => {
+  searchParams.keyword = "";
+  searchParams.categoryId = undefined;
+  searchParams.status = undefined;
+  search();
+};
 
 const openDialog = (type: string, row?: any) => {
   dialogTitle.value = type === "add" ? "新增商品" : "编辑商品";
-  if (row) { Object.assign(formData, row); } else { Object.assign(formData, { id: undefined, name: "", categoryId: null, brand: "", price: 0, originalPrice: 0, stock: 0, recommend: 0, description: "" }); }
+  if (row) {
+    Object.assign(formData, row);
+  } else {
+    Object.assign(formData, {
+      id: undefined,
+      name: "",
+      categoryId: null,
+      brand: "",
+      mainImage: "",
+      price: 0,
+      originalPrice: 0,
+      stock: 0,
+      recommend: 0,
+      description: ""
+    });
+  }
   dialogVisible.value = true;
 };
 
 const submitForm = async () => {
   try {
-    if (formData.id) { await http.put("/api/admin/products/" + formData.id, formData); }
-    else { await http.post("/api/admin/products", formData); }
+    if (formData.id) {
+      await http.put("/api/admin/products/" + formData.id, formData);
+    } else {
+      await http.post("/api/admin/products", formData);
+    }
     ElMessage.success("操作成功");
     dialogVisible.value = false;
     getTableData();
-  } catch (e) { /* handled by interceptor */ }
+  } catch (e) {
+    /* handled by interceptor */
+  }
 };
 
 const toggleStatus = async (row: any) => {
@@ -135,5 +192,21 @@ const deleteProduct = async (id: number) => {
   getTableData();
 };
 
-onMounted(() => { getCategories(); getTableData(); });
+onMounted(() => {
+  getCategories();
+  getTableData();
+});
 </script>
+
+<style scoped>
+.search-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 4px;
+}
+</style>

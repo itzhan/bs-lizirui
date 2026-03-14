@@ -14,13 +14,13 @@ export const loginApi = (params: Login.ReqLoginForm) => {
 // 获取菜单列表 — 使用本地 JSON 菜单
 export const getAuthMenuListApi = () => {
   // return http.get<Menu.MenuOptions[]>(`/api/menu/list`, {}, { loading: false });
-  return authMenuList;
+  return { data: authMenuList };
 };
 
 // 获取按钮权限 — 使用本地 JSON 权限
 export const getAuthButtonListApi = () => {
   // return http.get<Login.ResAuthButtons>(`/api/auth/buttons`, {}, { loading: false });
-  return authButtonList;
+  return { data: authButtonList };
 };
 
 // 用户退出登录

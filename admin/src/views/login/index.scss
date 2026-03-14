@@ -1,10 +1,7 @@
 .login-container {
   height: 100%;
   min-height: 550px;
-  background-color: #eeeeee;
-  background-image: url("@/assets/images/login_bg.svg");
-  background-size: 100% 100%;
-  background-size: cover;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #e1bee7 100%);
   .login-box {
     position: relative;
     box-sizing: border-box;
@@ -14,8 +11,10 @@
     width: 96.5%;
     height: 94%;
     padding: 0 50px;
-    background-color: rgb(255 255 255 / 80%);
-    border-radius: 10px;
+    background-color: rgb(255 255 255 / 85%);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgb(244 143 177 / 20%);
     .dark {
       position: absolute;
       top: 13px;
@@ -31,25 +30,25 @@
     }
     .login-form {
       width: 420px;
-      padding: 50px 40px 45px;
+      padding: 50px 40px 25px;
       background-color: var(--el-bg-color);
-      border-radius: 10px;
-      box-shadow: rgb(0 0 0 / 10%) 0 2px 10px 2px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgb(244 143 177 / 15%);
       .login-logo {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 45px;
+        margin-bottom: 40px;
         .login-icon {
           width: 60px;
           height: 52px;
         }
         .logo-text {
-          padding: 0 0 0 25px;
+          padding: 0 0 0 12px;
           margin: 0;
-          font-size: 42px;
+          font-size: 36px;
           font-weight: bold;
-          color: #34495e;
+          color: #e91e63;
           white-space: nowrap;
         }
       }
@@ -64,6 +63,13 @@
         white-space: nowrap;
         .el-button {
           width: 185px;
+        }
+        .el-button--primary {
+          background: linear-gradient(135deg, #e91e63, #ff6b9d);
+          border: none;
+        }
+        .el-button--primary:hover {
+          background: linear-gradient(135deg, #c2185b, #e91e63);
         }
       }
     }

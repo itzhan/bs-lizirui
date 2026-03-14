@@ -1,90 +1,46 @@
 @echo off
-chcp 65001 >nul 2>&1
-setlocal enabledelayedexpansion
+chcp 65001 >nul
+title Baby Shop - Startup
 
-:: ============================================
-:: 母婴商城系统 - Windows 一键启动脚本
-:: ============================================
+echo =====================================
+echo    Baby Shop - Starting Services
+echo =====================================
+
+set ROOT_DIR=%~dp0
+
+:: Create logs directory
+if not exist "%ROOT_DIR%logs" mkdir "%ROOT_DIR%logs"
+
+:: Kill existing processes on ports
+echo [1/3] Clearing ports...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8080" ^| findstr "LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5173" ^| findstr "LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000" ^| findstr "LISTENING"') do taskkill /PID %%a /F >nul 2>&1
+echo   Done.
+
+:: Start backend
+echo [2/3] Starting backend (port 8080)...
+start /B cmd /c "cd /d %ROOT_DIR%backend && mvnw.cmd spring-boot:run -DskipTests > %ROOT_DIR%logs\backend.log 2>&1"
+timeout /t 15 /nobreak >nul
+
+:: Start admin
+echo [3/3] Starting admin (port 5173) and frontend (port 3000)...
+start /B cmd /c "cd /d %ROOT_DIR%admin && npx vite --port 5173 > %ROOT_DIR%logs\admin.log 2>&1"
+start /B cmd /c "cd /d %ROOT_DIR%frontend && npx vite --port 3000 > %ROOT_DIR%logs\frontend.log 2>&1"
+timeout /t 5 /nobreak >nul
 
 echo.
-echo ╔═══════════════════════════════════════════╗
-echo ║       母婴商城系统 · 一键启动 (Win)      ║
-echo ╚═══════════════════════════════════════════╝
+echo =====================================
+echo    All services started!
+echo =====================================
 echo.
-
-:: ----------- 获取脚本所在目录 -----------
-set "PROJECT_DIR=%~dp0"
-
-:: ============================================
-:: 1. 清理旧进程
-:: ============================================
-echo [1/3] 清理旧进程...
-taskkill /F /IM "java.exe" /T >nul 2>&1
-if %errorlevel%==0 (
-    echo   √ 已清理旧的 Java 进程
-) else (
-    echo   √ 无需清理
-)
+echo   Frontend:  http://localhost:3000
+echo   Admin:     http://localhost:5173
+echo   Backend:   http://localhost:8080
 echo.
-
-:: ============================================
-:: 2. 安装前端依赖（如需要）
-:: ============================================
-echo [2/3] 检查前端依赖...
-if not exist "%PROJECT_DIR%admin\node_modules" (
-    echo   → 安装前端依赖 (pnpm install)...
-    cd /d "%PROJECT_DIR%admin" && pnpm install --frozen-lockfile
-    echo   √ 前端依赖安装完成
-) else (
-    echo   √ 前端依赖已安装
-)
+echo   Admin:  admin / admin123
+echo   User:   user1 / user123
 echo.
-
-:: ============================================
-:: 3. 启动服务
-:: ============================================
-echo [3/3] 启动服务...
-
-:: --- 启动后端 ---
-echo   → 启动后端服务 (Spring Boot)...
-start "BabyShop-Backend" cmd /k "cd /d %PROJECT_DIR%backend && mvn spring-boot:run"
-echo   √ 后端服务窗口已打开
-
-:: --- 启动管理前端 ---
-echo   → 启动管理前端 (Vite)...
-start "BabyShop-Admin" cmd /k "cd /d %PROJECT_DIR%admin && pnpm dev"
-echo   √ 管理前端窗口已打开
-
-:: ============================================
-:: 信息面板
-:: ============================================
+echo   Press Ctrl+C to stop.
 echo.
-echo ═══════════════════════════════════════════════════════
-echo         母婴商城系统 · 启动完成
-echo ═══════════════════════════════════════════════════════
-echo.
-echo   后端 API :  http://localhost:8080
-echo   管理后台 :  http://localhost:3100
-echo.
-echo ───────────────────────────────────────────────────────
-echo   角色          用户名        密码
-echo ───────────────────────────────────────────────────────
-echo   管理员        admin         admin123
-echo   张妈妈        user1         user123
-echo   李爸爸        user2         user123
-echo   王妈妈        user3         user123
-echo   赵爸爸        user4         user123
-echo   刘妈妈        user5         user123
-echo   陈妈妈        user6         user123
-echo   孙爸爸        user7         user123
-echo   周妈妈        user8         user123 (已禁用)
-echo   吴妈妈        user9         user123
-echo ───────────────────────────────────────────────────────
-echo.
-echo   提示: 后端和前端已在独立窗口中启动
-echo   关闭对应窗口即可停止对应服务
-echo.
-echo ═══════════════════════════════════════════════════════
-echo.
-
 pause

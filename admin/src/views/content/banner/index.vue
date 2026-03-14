@@ -2,7 +2,7 @@
   <div class="table-box">
     <el-card shadow="never">
       <template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center">
           <span>轮播图管理</span>
           <el-button type="success" @click="openDialog('add')">新增轮播图</el-button>
         </div>
@@ -11,12 +11,16 @@
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="title" label="标题" width="200" />
         <el-table-column prop="imageUrl" label="图片" width="200">
-          <template #default="{ row }"><el-image v-if="row.imageUrl" :src="row.imageUrl" style="height: 50px" fit="cover" /></template>
+          <template #default="{ row }">
+            <el-image v-if="row.imageUrl" :src="row.imageUrl" style="height: 50px" fit="cover" />
+          </template>
         </el-table-column>
         <el-table-column prop="linkUrl" label="链接" min-width="200" show-overflow-tooltip />
         <el-table-column prop="sort" label="排序" width="80" />
         <el-table-column prop="status" label="状态" width="80">
-          <template #default="{ row }"><el-tag :type="row.status === 1 ? 'success' : 'info'">{{ row.status === 1 ? '启用' : '禁用' }}</el-tag></template>
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'info'">{{ row.status === 1 ? "启用" : "禁用" }}</el-tag>
+          </template>
         </el-table-column>
         <el-table-column label="操作" width="160">
           <template #default="{ row }">
@@ -63,7 +67,9 @@ const getData = async () => {
   try {
     const { data } = await http.get<any>("/api/admin/banners", {}, { loading: false });
     tableData.value = data || [];
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 };
 
 const openDialog = (type: string, row?: any) => {

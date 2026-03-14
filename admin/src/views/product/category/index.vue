@@ -2,7 +2,7 @@
   <div class="table-box">
     <el-card shadow="never">
       <template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center">
           <span>分类管理</span>
           <el-button type="success" @click="openDialog('add')">新增分类</el-button>
         </div>
@@ -14,7 +14,7 @@
         <el-table-column prop="sort" label="排序" width="80" />
         <el-table-column prop="status" label="状态" width="80">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '启用' : '禁用' }}</el-tag>
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? "启用" : "禁用" }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="160">
@@ -66,7 +66,9 @@ const getData = async () => {
   try {
     const { data } = await http.get<any>("/api/admin/categories", {}, { loading: false });
     tableData.value = data || [];
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 };
 
 const openDialog = (type: string, row?: any) => {

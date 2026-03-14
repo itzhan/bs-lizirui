@@ -24,9 +24,15 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination v-model:current-page="searchParams.page" v-model:page-size="searchParams.size"
-        :page-sizes="[10, 20, 50]" :total="total" layout="total, sizes, prev, pager, next" @change="getTableData"
-        style="margin-top: 16px; justify-content: flex-end;" />
+      <el-pagination
+        v-model:current-page="searchParams.page"
+        v-model:page-size="searchParams.size"
+        :page-sizes="[10, 20, 50]"
+        :total="total"
+        layout="total, sizes, prev, pager, next"
+        @change="getTableData"
+        style="margin-top: 16px; justify-content: flex-end"
+      />
     </el-card>
   </div>
 </template>
@@ -47,7 +53,9 @@ const getTableData = async () => {
     const { data } = await http.get<any>("/api/admin/reviews", searchParams, { loading: false });
     tableData.value = data.records || [];
     total.value = data.total || 0;
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 };
 
 const toggleStatus = async (row: any) => {

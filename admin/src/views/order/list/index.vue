@@ -1,6 +1,6 @@
 <template>
   <div class="table-box">
-    <div class="card table-search" style="margin-bottom: 16px;">
+    <div class="card table-search" style="margin-bottom: 16px">
       <el-form :inline="true">
         <el-form-item label="订单号"><el-input v-model="searchParams.orderNo" placeholder="订单号" clearable /></el-form-item>
         <el-form-item label="状态">
@@ -8,7 +8,9 @@
             <el-option v-for="(text, idx) in statusList" :key="idx" :label="text" :value="idx" />
           </el-select>
         </el-form-item>
-        <el-form-item label="收货人"><el-input v-model="searchParams.keyword" placeholder="收货人/手机号" clearable /></el-form-item>
+        <el-form-item label="收货人">
+          <el-input v-model="searchParams.keyword" placeholder="收货人/手机号" clearable />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
           <el-button @click="resetSearch">重置</el-button>
@@ -33,33 +35,49 @@
           <template #default="{ row }">
             <el-button link type="primary" @click="viewDetail(row)">详情</el-button>
             <el-button link type="success" v-if="row.status === 1" @click="shipOrder(row.id)">发货</el-button>
-            <el-popconfirm title="确认退款?" @confirm="refundOrder(row.id)" v-if="row.status === 5 || row.status === 1 || row.status === 2">
+            <el-popconfirm
+              title="确认退款?"
+              @confirm="refundOrder(row.id)"
+              v-if="row.status === 5 || row.status === 1 || row.status === 2"
+            >
               <template #reference><el-button link type="danger">退款</el-button></template>
             </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination v-model:current-page="searchParams.page" v-model:page-size="searchParams.size"
-        :page-sizes="[10, 20, 50]" :total="total" layout="total, sizes, prev, pager, next" @change="getTableData"
-        style="margin-top: 16px; justify-content: flex-end;" />
+      <el-pagination
+        v-model:current-page="searchParams.page"
+        v-model:page-size="searchParams.size"
+        :page-sizes="[10, 20, 50]"
+        :total="total"
+        layout="total, sizes, prev, pager, next"
+        @change="getTableData"
+        style="margin-top: 16px; justify-content: flex-end"
+      />
     </el-card>
 
     <el-dialog v-model="detailVisible" title="订单详情" width="600px">
       <el-descriptions :column="2" border v-if="currentOrder">
         <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
-        <el-descriptions-item label="状态"><el-tag :type="statusType(currentOrder.status)">{{ statusList[currentOrder.status] }}</el-tag></el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <el-tag :type="statusType(currentOrder.status)">{{ statusList[currentOrder.status] }}</el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="收货人">{{ currentOrder.receiver }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ currentOrder.phone }}</el-descriptions-item>
         <el-descriptions-item label="地址" :span="2">{{ currentOrder.address }}</el-descriptions-item>
         <el-descriptions-item label="总金额">¥{{ currentOrder.totalAmount }}</el-descriptions-item>
         <el-descriptions-item label="下单时间">{{ currentOrder.createdAt }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ currentOrder.remark || '无' }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="2">{{ currentOrder.remark || "无" }}</el-descriptions-item>
       </el-descriptions>
       <el-table :data="orderItems" stripe style="margin-top: 16px">
         <el-table-column prop="productName" label="商品名称" />
-        <el-table-column prop="price" label="单价" width="100"><template #default="{ row }">¥{{ row.price }}</template></el-table-column>
+        <el-table-column prop="price" label="单价" width="100">
+          <template #default="{ row }">¥{{ row.price }}</template>
+        </el-table-column>
         <el-table-column prop="quantity" label="数量" width="80" />
-        <el-table-column prop="subtotal" label="小计" width="100"><template #default="{ row }">¥{{ row.subtotal }}</template></el-table-column>
+        <el-table-column prop="subtotal" label="小计" width="100">
+          <template #default="{ row }">¥{{ row.subtotal }}</template>
+        </el-table-column>
       </el-table>
     </el-dialog>
   </div>
@@ -86,11 +104,21 @@ const getTableData = async () => {
     const { data } = await http.get<any>("/api/admin/orders", searchParams, { loading: false });
     tableData.value = data.records || [];
     total.value = data.total || 0;
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 };
 
-const search = () => { searchParams.page = 1; getTableData(); };
-const resetSearch = () => { searchParams.orderNo = ""; searchParams.keyword = ""; searchParams.status = undefined; search(); };
+const search = () => {
+  searchParams.page = 1;
+  getTableData();
+};
+const resetSearch = () => {
+  searchParams.orderNo = "";
+  searchParams.keyword = "";
+  searchParams.status = undefined;
+  search();
+};
 
 const viewDetail = async (row: any) => {
   const { data } = await http.get<any>("/api/admin/orders/" + row.id, {}, { loading: false });

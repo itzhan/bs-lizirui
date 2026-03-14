@@ -10,7 +10,13 @@
       </el-input>
     </el-form-item>
     <el-form-item prop="password">
-      <el-input v-model="loginForm.password" type="password" placeholder="密码：admin123" show-password autocomplete="new-password">
+      <el-input
+        v-model="loginForm.password"
+        type="password"
+        placeholder="密码：admin123"
+        show-password
+        autocomplete="new-password"
+      >
         <template #prefix>
           <el-icon class="el-input__icon">
             <lock />
@@ -86,6 +92,9 @@ const login = (formEl: FormInstance | undefined) => {
         type: "success",
         duration: 3000
       });
+    } catch (error: any) {
+      console.error("登录失败:", error);
+      ElNotification({ title: "登录失败", message: error?.message || error?.msg || "请检查用户名和密码", type: "error" });
     } finally {
       loading.value = false;
     }

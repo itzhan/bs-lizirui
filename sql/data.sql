@@ -15,16 +15,16 @@ SET CHARACTER_SET_CONNECTION = utf8mb4;
 -- 密码均为 BCrypt 加密
 -- -------------------------------------------
 INSERT INTO `user` (`id`,`username`,`password`,`nickname`,`phone`,`email`,`avatar`,`gender`,`role`,`status`,`created_at`) VALUES
-(1, 'admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '系统管理员', '13800000001', 'admin@babyshop.com', NULL, 1, 'ADMIN', 1, '2025-01-15 09:00:00'),
-(2, 'user1', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '张妈妈', '13900001001', 'zhangmama@qq.com', NULL, 2, 'USER', 1, '2025-02-10 10:30:00'),
-(3, 'user2', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '李爸爸', '13900001002', 'libaba@qq.com', NULL, 1, 'USER', 1, '2025-02-15 14:20:00'),
-(4, 'user3', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '王妈妈', '13900001003', 'wangmama@163.com', NULL, 2, 'USER', 1, '2025-03-01 08:00:00'),
-(5, 'user4', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '赵爸爸', '13900001004', 'zhaobaba@163.com', NULL, 1, 'USER', 1, '2025-03-10 16:45:00'),
-(6, 'user5', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '刘妈妈', '13900001005', 'liumama@qq.com', NULL, 2, 'USER', 1, '2025-03-20 11:30:00'),
-(7, 'user6', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '陈妈妈', '13900001006', 'chenmama@qq.com', NULL, 2, 'USER', 1, '2025-04-05 09:15:00'),
-(8, 'user7', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '孙爸爸', '13900001007', 'sunbaba@126.com', NULL, 1, 'USER', 1, '2025-04-12 13:00:00'),
-(9, 'user8', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '周妈妈', '13900001008', 'zhoumama@qq.com', NULL, 2, 'USER', 0, '2025-05-01 10:00:00'),
-(10, 'user9', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj7C6', '吴妈妈', '13900001009', 'wumama@qq.com', NULL, 2, 'USER', 1, '2025-05-15 15:30:00');
+(1, 'admin', '$2b$10$E5SXj3LGWRHw9Slog697TevZNHWQpXqmrtUFoqqoGNbsqKQV8t90W', '系统管理员', '13800000001', 'admin@babyshop.com', NULL, 1, 'ADMIN', 1, '2025-01-15 09:00:00'),
+(2, 'user1', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '张妈妈', '13900001001', 'zhangmama@qq.com', NULL, 2, 'USER', 1, '2025-02-10 10:30:00'),
+(3, 'user2', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '李爸爸', '13900001002', 'libaba@qq.com', NULL, 1, 'USER', 1, '2025-02-15 14:20:00'),
+(4, 'user3', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '王妈妈', '13900001003', 'wangmama@163.com', NULL, 2, 'USER', 1, '2025-03-01 08:00:00'),
+(5, 'user4', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '赵爸爸', '13900001004', 'zhaobaba@163.com', NULL, 1, 'USER', 1, '2025-03-10 16:45:00'),
+(6, 'user5', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '刘妈妈', '13900001005', 'liumama@qq.com', NULL, 2, 'USER', 1, '2025-03-20 11:30:00'),
+(7, 'user6', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '陈妈妈', '13900001006', 'chenmama@qq.com', NULL, 2, 'USER', 1, '2025-04-05 09:15:00'),
+(8, 'user7', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '孙爸爸', '13900001007', 'sunbaba@126.com', NULL, 1, 'USER', 1, '2025-04-12 13:00:00'),
+(9, 'user8', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '周妈妈', '13900001008', 'zhoumama@qq.com', NULL, 2, 'USER', 0, '2025-05-01 10:00:00'),
+(10, 'user9', '$2b$10$ue.hpp2HeS9Y/77mz6ws9OzOAdc.m3zsv/kRncLkfrOAW6kULF4gm', '吴妈妈', '13900001009', 'wumama@qq.com', NULL, 2, 'USER', 1, '2025-05-15 15:30:00');
 
 -- -------------------------------------------
 -- 商品分类

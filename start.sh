@@ -1,196 +1,119 @@
 #!/bin/bash
-# ============================================
-# 母婴商城系统 — Mac 一键启动脚本
-# ============================================
-
+# 母婴乐园商城 — 一键启动脚本 (macOS)
 set -e
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
 
-# ----------- 配置区 -----------
-MYSQL_USER="root"
-MYSQL_PASS="ab123168"
-DB_NAME="babyshop"
-BACKEND_PORT=8080
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SQL_DIR="$PROJECT_DIR/sql"
-BACKEND_DIR="$PROJECT_DIR/backend"
-ADMIN_DIR="$PROJECT_DIR/admin"
+echo -e "${CYAN}=====================================${NC}"
+echo -e "${CYAN}   🍼 母婴乐园商城 — 一键启动      ${NC}"
+echo -e "${CYAN}=====================================${NC}"
 
-# 颜色定义
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-PURPLE='\033[0;35m'
-BOLD='\033[1m'
-NC='\033[0m'
+# ---------- 1. 环境检测 ----------
+check_cmd() { command -v "$1" &>/dev/null; }
 
-# PID 追踪
-BACKEND_PID=""
-ADMIN_PID=""
-
-# ============================================
-# 清理函数（Ctrl+C 退出时调用）
-# ============================================
-cleanup() {
-    echo ""
-    echo -e "${YELLOW}┌─────────────────────────────────────────┐${NC}"
-    echo -e "${YELLOW}│       正在关闭所有服务...               │${NC}"
-    echo -e "${YELLOW}└─────────────────────────────────────────┘${NC}"
-
-    if [ -n "$BACKEND_PID" ]; then
-        kill $BACKEND_PID 2>/dev/null && echo -e "${GREEN}  ✔ 后端服务已停止${NC}" || true
-    fi
-    if [ -n "$ADMIN_PID" ]; then
-        kill $ADMIN_PID 2>/dev/null && echo -e "${GREEN}  ✔ 管理前端已停止${NC}" || true
-    fi
-    # 清理可能残留的 8080 端口进程
-    lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
-
-    echo -e "${GREEN}${BOLD}  全部服务已关闭，再见！${NC}"
-    exit 0
-}
-
-trap cleanup SIGINT SIGTERM
-
-# ============================================
-# 1. 依赖检查
-# ============================================
-echo ""
-echo -e "${CYAN}${BOLD}╔═══════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}${BOLD}║       🍼 母婴商城系统 · 一键启动         ║${NC}"
-echo -e "${CYAN}${BOLD}╚═══════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "${BLUE}[1/4] 检查运行环境...${NC}"
-
-MISSING=0
+echo -e "\n${YELLOW}[1/5] 检测环境...${NC}"
 for cmd in java mvn node pnpm mysql; do
-    if command -v $cmd &>/dev/null; then
-        VERSION=$($cmd --version 2>&1 | head -1)
-        echo -e "  ${GREEN}✔${NC} $cmd  →  $VERSION"
+  if check_cmd $cmd; then
+    echo -e "  ✅ $cmd: $(command $cmd --version 2>&1 | head -1)"
+  else
+    echo -e "  ${RED}❌ $cmd 未安装${NC}"
+    if [ "$cmd" = "pnpm" ]; then
+      echo -e "  ${YELLOW}正在安装 pnpm...${NC}"
+      npm install -g pnpm
     else
-        echo -e "  ${RED}✘ 缺少依赖: $cmd${NC}"
-        MISSING=1
+      echo -e "  ${RED}请先安装 $cmd 再运行此脚本${NC}"
+      exit 1
     fi
+  fi
 done
 
-if [ $MISSING -eq 1 ]; then
-    echo -e "${RED}${BOLD}请先安装缺失的依赖后再运行此脚本！${NC}"
-    exit 1
-fi
-echo ""
-
-# ============================================
-# 2. 清理旧端口
-# ============================================
-echo -e "${BLUE}[2/4] 清理旧进程...${NC}"
-OLD_PID=$(lsof -ti :$BACKEND_PORT 2>/dev/null || true)
-if [ -n "$OLD_PID" ]; then
-    echo "$OLD_PID" | xargs kill -9 2>/dev/null || true
-    echo -e "  ${YELLOW}⚠ 已清理端口 $BACKEND_PORT 上的旧进程${NC}"
+# ---------- 2. 数据库检测与初始化 ----------
+echo -e "\n${YELLOW}[2/5] 检测数据库...${NC}"
+DB_EXISTS=$(mysql -u root -pab123168 -e "SHOW DATABASES LIKE 'babyshop';" 2>/dev/null | grep babyshop || true)
+if [ -z "$DB_EXISTS" ]; then
+  echo -e "  📦 数据库不存在，正在初始化..."
+  mysql -u root -pab123168 < "$ROOT_DIR/sql/init.sql"
+  mysql -u root -pab123168 babyshop < "$ROOT_DIR/sql/data.sql"
+  echo -e "  ${GREEN}✅ 数据库初始化完成${NC}"
 else
-    echo -e "  ${GREEN}✔ 端口 $BACKEND_PORT 已空闲${NC}"
-fi
-echo ""
-
-# ============================================
-# 3. 数据库导入
-# ============================================
-echo -e "${BLUE}[3/4] 检查数据库...${NC}"
-
-# 检测数据库是否存在
-DB_EXISTS=$(mysql -u"$MYSQL_USER" -p"$MYSQL_PASS" -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$DB_NAME'" 2>/dev/null | grep "$DB_NAME" || true)
-
-if [ -n "$DB_EXISTS" ]; then
-    echo -e "  ${GREEN}✔ 数据库 '${DB_NAME}' 已存在，跳过导入${NC}"
-else
-    echo -e "  ${YELLOW}➜ 数据库 '${DB_NAME}' 不存在，开始导入...${NC}"
-
-    # 导入结构
-    if [ -f "$SQL_DIR/init.sql" ]; then
-        mysql -u"$MYSQL_USER" -p"$MYSQL_PASS" < "$SQL_DIR/init.sql" 2>/dev/null
-        echo -e "  ${GREEN}✔ 数据库结构导入完成 (init.sql)${NC}"
-    else
-        echo -e "  ${RED}✘ 找不到 sql/init.sql${NC}"
-        exit 1
-    fi
-
-    # 导入数据
-    if [ -f "$SQL_DIR/data.sql" ]; then
-        mysql -u"$MYSQL_USER" -p"$MYSQL_PASS" < "$SQL_DIR/data.sql" 2>/dev/null
-        echo -e "  ${GREEN}✔ 测试数据导入完成 (data.sql)${NC}"
-    else
-        echo -e "  ${RED}✘ 找不到 sql/data.sql${NC}"
-        exit 1
-    fi
-
-    echo -e "  ${GREEN}${BOLD}✔ 数据库初始化完成！${NC}"
-fi
-echo ""
-
-# ============================================
-# 4. 启动服务
-# ============================================
-echo -e "${BLUE}[4/4] 启动服务...${NC}"
-
-# --- 安装前端依赖 ---
-if [ ! -d "$ADMIN_DIR/node_modules" ]; then
-    echo -e "  ${YELLOW}➜ 安装前端依赖 (pnpm install)...${NC}"
-    cd "$ADMIN_DIR" && pnpm install --frozen-lockfile 2>&1 | tail -3
-    echo -e "  ${GREEN}✔ 前端依赖安装完成${NC}"
+  echo -e "  ✅ 数据库 babyshop 已存在"
 fi
 
-# --- 启动后端 ---
-echo -e "  ${CYAN}➜ 启动后端服务 (Spring Boot)...${NC}"
-cd "$BACKEND_DIR" && mvn spring-boot:run -q 2>&1 &
+# ---------- 3. 端口清理 ----------
+echo -e "\n${YELLOW}[3/5] 清理端口...${NC}"
+for port in 8080 5173 3000; do
+  pid=$(lsof -ti :$port 2>/dev/null || true)
+  if [ -n "$pid" ]; then
+    echo -e "  ⚠️  端口 $port 被占用 (PID: $pid)，正在终止..."
+    kill -9 $pid 2>/dev/null || true
+  fi
+done
+echo -e "  ✅ 端口已清理"
+
+# ---------- 4. 安装依赖 ----------
+echo -e "\n${YELLOW}[4/5] 安装依赖...${NC}"
+if [ ! -d "$ROOT_DIR/admin/node_modules" ]; then
+  echo -e "  📦 安装 admin 依赖..."
+  (cd "$ROOT_DIR/admin" && pnpm install --frozen-lockfile 2>/dev/null || pnpm install)
+fi
+if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
+  echo -e "  📦 安装 frontend 依赖..."
+  (cd "$ROOT_DIR/frontend" && pnpm install)
+fi
+echo -e "  ✅ 依赖已就绪"
+
+# ---------- 5. 启动服务 ----------
+echo -e "\n${YELLOW}[5/5] 启动服务...${NC}"
+
+# 后端
+echo -e "  🚀 启动后端 (port 8080)..."
+(cd "$ROOT_DIR/backend" && ./mvnw spring-boot:run -DskipTests > "$ROOT_DIR/logs/backend.log" 2>&1) &
 BACKEND_PID=$!
-echo -e "  ${GREEN}✔ 后端服务启动中 (PID: $BACKEND_PID)${NC}"
 
-# --- 启动管理前端 ---
-echo -e "  ${CYAN}➜ 启动管理前端 (Vite)...${NC}"
-cd "$ADMIN_DIR" && pnpm dev 2>&1 &
+# 等待后端就绪
+echo -e "  ⏳ 等待后端启动..."
+for i in $(seq 1 30); do
+  if curl -s http://localhost:8080/api/banners > /dev/null 2>&1; then
+    echo -e "  ${GREEN}✅ 后端已就绪${NC}"
+    break
+  fi
+  sleep 2
+done
+
+# Admin
+echo -e "  🚀 启动管理后台 (port 5173)..."
+(cd "$ROOT_DIR/admin" && npx vite --port 5173 > "$ROOT_DIR/logs/admin.log" 2>&1) &
 ADMIN_PID=$!
-echo -e "  ${GREEN}✔ 管理前端启动中 (PID: $ADMIN_PID)${NC}"
 
-# --- 等待服务启动 ---
-echo ""
-echo -e "${YELLOW}  ⏳ 等待服务启动（约15秒）...${NC}"
-sleep 15
+# Frontend
+echo -e "  🚀 启动用户前端 (port 3000)..."
+(cd "$ROOT_DIR/frontend" && npx vite --port 3000 > "$ROOT_DIR/logs/frontend.log" 2>&1) &
+FRONTEND_PID=$!
 
-# ============================================
-# 信息面板
-# ============================================
-echo ""
-echo -e "${CYAN}${BOLD}╔═══════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}${BOLD}║              🍼 母婴商城系统 · 启动完成              ║${NC}"
-echo -e "${CYAN}${BOLD}╠═══════════════════════════════════════════════════════╣${NC}"
-echo -e "${CYAN}${BOLD}║                                                       ║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}📡 后端 API :${NC}  http://localhost:8080               ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}🖥  管理后台 :${NC}  http://localhost:3100               ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║                                                       ║${NC}"
-echo -e "${CYAN}${BOLD}╠═══════════════════════════════════════════════════════╣${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${PURPLE}${BOLD}角色          用户名        密码${NC}                    ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}╠═══════════════════════════════════════════════════════╣${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${GREEN}👑 管理员${NC}     admin         admin123                ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 张妈妈${NC}     user1         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 李爸爸${NC}     user2         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 王妈妈${NC}     user3         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 赵爸爸${NC}     user4         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 刘妈妈${NC}     user5         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 陈妈妈${NC}     user6         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 孙爸爸${NC}     user7         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${YELLOW}🚫 周妈妈${NC}     user8         user123 ${RED}(已禁用)${NC}       ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${BLUE}👤 吴妈妈${NC}     user9         user123                 ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}║                                                       ║${NC}"
-echo -e "${CYAN}${BOLD}╠═══════════════════════════════════════════════════════╣${NC}"
-echo -e "${CYAN}${BOLD}║${NC}  ${YELLOW}按 Ctrl+C 可安全退出所有服务${NC}                        ${CYAN}${BOLD}║${NC}"
-echo -e "${CYAN}${BOLD}╚═══════════════════════════════════════════════════════╝${NC}"
-echo ""
+sleep 3
 
-# ============================================
-# 实时日志（等待子进程结束）
-# ============================================
-echo -e "${PURPLE}${BOLD}══════════════ 实时日志输出 ══════════════${NC}"
-echo ""
+echo -e "\n${GREEN}=====================================${NC}"
+echo -e "${GREEN}   🎉 所有服务已启动！              ${NC}"
+echo -e "${GREEN}=====================================${NC}"
+echo -e ""
+echo -e "  📱 用户前端:   ${CYAN}http://localhost:3000${NC}"
+echo -e "  🔧 管理后台:   ${CYAN}http://localhost:5173${NC}"
+echo -e "  🖥️  后端API:    ${CYAN}http://localhost:8080${NC}"
+echo -e ""
+echo -e "  ${YELLOW}测试账号：${NC}"
+echo -e "  ┌──────────┬──────────┬──────────┐"
+echo -e "  │  角色    │  用户名  │  密码    │"
+echo -e "  ├──────────┼──────────┼──────────┤"
+echo -e "  │  管理员  │  admin   │ admin123 │"
+echo -e "  │  用户    │  user1   │ user123  │"
+echo -e "  └──────────┴──────────┴──────────┘"
+echo -e ""
+echo -e "  ${YELLOW}按 Ctrl+C 停止所有服务${NC}"
+echo -e ""
 
-wait $BACKEND_PID $ADMIN_PID 2>/dev/null
+# 保存PID
+echo "$BACKEND_PID $ADMIN_PID $FRONTEND_PID" > "$ROOT_DIR/logs/.pids"
+
+# 等待退出
+trap "echo -e '\n${YELLOW}正在停止服务...${NC}'; kill $BACKEND_PID $ADMIN_PID $FRONTEND_PID 2>/dev/null; echo -e '${GREEN}已停止${NC}'; exit 0" INT TERM
+wait

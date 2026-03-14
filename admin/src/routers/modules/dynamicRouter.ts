@@ -47,6 +47,7 @@ export const initDynamicRouter = async () => {
     });
   } catch (error) {
     // 当按钮 || 菜单请求出错时，重定向到登陆页
+    console.error("动态路由初始化失败:", error);
     userStore.setToken("");
     router.replace(LOGIN_URL);
     return Promise.reject(error);
