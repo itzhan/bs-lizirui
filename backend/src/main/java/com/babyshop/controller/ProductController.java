@@ -2,7 +2,9 @@ package com.babyshop.controller;
 
 import com.babyshop.common.Result;
 import com.babyshop.service.ProductService;
+import com.babyshop.service.UserBehaviorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
+    private final UserBehaviorService userBehaviorService;
 
     @GetMapping
     public Result<?> listProducts(
@@ -25,7 +28,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Result<?> getProduct(@PathVariable Long id) {
+    public Result<?> getProduct(@PathVariable Long id, Authentication authentication) {
+        // 记录浏览行为（仅登录用户）
+        if (authentication != null && authentication.getPrincipal() instanceof Long) {
+            Long userId = (Long) authentication.getPrincipal();
+            userBehaviorService.recordView(userId, id);
+        }
         return Result.success(productService.getById(id));
     }
 

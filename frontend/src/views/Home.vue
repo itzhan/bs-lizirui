@@ -194,7 +194,7 @@ const getDiscount = (p: any) => {
 onMounted(async () => {
   try { const r: any = await http.get('/banners'); banners.value = r.data || [] } catch {}
   try { const r: any = await http.get('/categories'); categories.value = (r.data || []).filter((c: any) => c.parentId === 0) } catch {}
-  try { const r: any = await http.get('/products/recommend', { params: { size: 8 } }); recommendProducts.value = r.data?.records || [] } catch {}
+  try { const r: any = await http.get('/recommend/cf', { params: { size: 8 } }); recommendProducts.value = r.data || [] } catch {}
   try { const r: any = await http.get('/products/hot', { params: { size: 8 } }); hotProducts.value = r.data?.records || [] } catch {}
   try { const r: any = await http.get('/products', { params: { page: 1, size: 4, sortBy: 'id', sortOrder: 'desc' } }); newProducts.value = r.data?.records || [] } catch {}
   try { const r: any = await http.get('/announcements', { params: { size: 1 } }); announcement.value = r.data?.records?.[0] || null } catch {}

@@ -27,6 +27,7 @@ public class OrderService extends ServiceImpl<OrderInfoMapper, OrderInfo> {
     private final CartService cartService;
     private final ProductService productService;
     private final AddressService addressService;
+    private final UserBehaviorService userBehaviorService;
 
     @Transactional
     public OrderInfo createOrder(Long userId, OrderCreateDTO dto) {
@@ -91,6 +92,11 @@ public class OrderService extends ServiceImpl<OrderInfoMapper, OrderInfo> {
         // 6. 清除购物车中已下单的商品
         for (Cart cart : cartItems) {
             cartService.removeById(cart.getId());
+        }
+
+        // 7. 记录购买行为（协同过滤数据采集）
+        for (OrderItem item : orderItems) {
+            userBehaviorService.recordPurchase(userId, item.getProductId());
         }
 
         return order;

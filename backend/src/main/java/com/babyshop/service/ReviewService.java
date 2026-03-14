@@ -20,6 +20,7 @@ import java.util.*;
 public class ReviewService extends ServiceImpl<ReviewMapper, Review> {
 
     private final UserMapper userMapper;
+    private final UserBehaviorService userBehaviorService;
 
     public PageResult<Map<String, Object>> listByProduct(Long productId, Integer page, Integer size) {
         Page<Review> pageParam = new Page<>(page, size);
@@ -66,6 +67,8 @@ public class ReviewService extends ServiceImpl<ReviewMapper, Review> {
         review.setImages(dto.getImages());
         review.setStatus(1);
         this.save(review);
+        // 记录评价行为（协同过滤数据采集）
+        userBehaviorService.recordRate(userId, dto.getProductId(), dto.getRating());
         return review;
     }
 

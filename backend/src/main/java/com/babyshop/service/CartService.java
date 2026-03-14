@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class CartService extends ServiceImpl<CartMapper, Cart> {
 
     private final ProductService productService;
+    private final UserBehaviorService userBehaviorService;
 
     public List<Map<String, Object>> listCartItems(Long userId) {
         List<Cart> carts = this.list(new LambdaQueryWrapper<Cart>()
@@ -70,6 +71,8 @@ public class CartService extends ServiceImpl<CartMapper, Cart> {
             cart.setQuantity(dto.getQuantity());
             cart.setChecked(1);
             this.save(cart);
+            // 记录加入购物车行为
+            userBehaviorService.recordCart(userId, dto.getProductId());
             return cart;
         }
     }

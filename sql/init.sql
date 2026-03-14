@@ -227,3 +227,20 @@ CREATE TABLE `banner` (
   `deleted` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='轮播图表';
+
+-- -------------------------------------------
+-- 12. 用户行为记录表（协同过滤推荐）
+-- -------------------------------------------
+DROP TABLE IF EXISTS `user_behavior`;
+CREATE TABLE `user_behavior` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL COMMENT '用户ID',
+  `product_id` BIGINT NOT NULL COMMENT '商品ID',
+  `behavior_type` VARCHAR(20) NOT NULL COMMENT '行为类型：view/cart/purchase/favorite/rate',
+  `score` DOUBLE NOT NULL DEFAULT 1.0 COMMENT '行为评分权重：view=1,cart=3,favorite=4,rate=评分,purchase=5',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_product_id` (`product_id`),
+  KEY `idx_behavior_type` (`behavior_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户行为记录表（协同过滤）';

@@ -168,13 +168,11 @@ const loadProduct = async () => {
   if (userStore.isLoggedIn) {
     try { const r: any = await http.get(`/favorites/check/${id.value}`); isFavorite.value = r.data === true } catch {}
   }
-  // Load related products by same category
-  if (product.value?.categoryId) {
-    try {
-      const r: any = await http.get('/products', { params: { categoryId: product.value.categoryId, size: 5 } })
-      relatedProducts.value = (r.data?.records || []).filter((p: any) => p.id !== id.value).slice(0, 5)
-    } catch {}
-  }
+  // 基于协同过滤的相似商品推荐
+  try {
+    const r: any = await http.get(`/recommend/similar/${id.value}`, { params: { size: 5 } })
+    relatedProducts.value = (r.data || []).filter((p: any) => p.id !== id.value).slice(0, 5)
+  } catch {}
 }
 
 const goToProduct = (pid: number) => {

@@ -18,6 +18,7 @@ import java.util.*;
 public class FavoriteService extends ServiceImpl<FavoriteMapper, Favorite> {
 
     private final ProductService productService;
+    private final UserBehaviorService userBehaviorService;
 
     public PageResult<Map<String, Object>> listByUser(Long userId, Integer page, Integer size) {
         Page<Favorite> pageParam = new Page<>(page, size);
@@ -56,6 +57,8 @@ public class FavoriteService extends ServiceImpl<FavoriteMapper, Favorite> {
         fav.setUserId(userId);
         fav.setProductId(productId);
         this.save(fav);
+        // 记录收藏行为
+        userBehaviorService.recordFavorite(userId, productId);
     }
 
     public void removeFavorite(Long userId, Long productId) {
