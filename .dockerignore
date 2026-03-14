@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# Node
+**/node_modules
+**/.cache
+**/.temp
+
+# Java
+**/target
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs
+*.docx
+*.md
+docs/
+论文要求/
+
+# Logs
+logs/
+*.log
+
+# Build artifacts (前端已有dist不排除，由Dockerfile内部build)
