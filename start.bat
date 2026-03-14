@@ -14,9 +14,9 @@ echo =====================================
 echo    所有服务已启动！
 echo =====================================
 echo.
-echo   用户前端:  http://localhost:3000
+echo   用户前端:  http://localhost:13000
 echo   管理后台:  http://localhost:8848
-echo   后端API:   http://localhost:8080
+echo   后端API:   http://localhost:18081
 echo.
 echo   管理员:  admin / admin123
 echo   用户:    user1 / user123
