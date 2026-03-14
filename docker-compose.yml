@@ -40,9 +40,9 @@ services:
       UPLOAD_PATH: /app/uploads/
       UPLOAD_BASE_URL: http://localhost:8080/uploads/
     ports:
-      - "8080:8080"
+      - "18081:8080"
     volumes:
-      - uploads_data:/app/uploads
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/banners"]
       interval: 15s
@@ -61,9 +61,9 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "13000:3000"
     volumes:
-      - uploads_data:/usr/share/nginx/uploads:ro
+      - ./uploads:/usr/share/nginx/uploads:ro
 
   # ========== 管理后台 ==========
   admin:
@@ -78,10 +78,8 @@ services:
     ports:
       - "8848:8848"
     volumes:
-      - uploads_data:/usr/share/nginx/uploads:ro
+      - ./uploads:/usr/share/nginx/uploads:ro
 
 volumes:
   mysql_data:
-    driver: local
-  uploads_data:
     driver: local
